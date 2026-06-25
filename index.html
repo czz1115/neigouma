@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>内购码领取</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+    background: #f5f5f5;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+  button {
+    padding: 14px 28px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    background: #1677ff;
+    color: #fff;
+    cursor: pointer;
+  }
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  .code {
+    margin-top: 24px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #e63946;
+    word-break: break-all;
+  }
+  .info {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #888;
+  }
+  .tips {
+    margin-top: 40px;
+    padding: 16px;
+    background: #fff8e6;
+    border-radius: 8px;
+    border: 1px solid #ffe0b2;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .tips h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #e6a23c;
+  }
+  .tips p {
+    margin: 4px 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<h2>🎁 内购码领取</h2>
+<p class="subtitle">每人最多可领取 <b>2</b> 个内购码，先到先得</p>
+
+<button id="btn">立即领取</button>
+<div class="code" id="result"></div>
+<div class="info" id="info"></div>
+
+<div class="tips">
+  <h4>📌 温馨提示</h4>
+  <p>1、每个人仅限领取两次兑换码</p>
+  <p>2、兑换码数量有限，先到先得</p>
+  <p>3、请妥善保管你的兑换码</p>
+</div>
+
+<script>
+let codePool = [
+  "NG11ZUH1ls","NG11Nlmauz","NG114cYrGy","NG119TQyfm","NG118aIUrS",
+  "NG11Qlou4O","NG11q1y8xY","NG11qhPY8o","NG11t8VRf9","NG114TAOEg",
+  "NG11FN3YMB","NG11iS581a","NG11ayo4zj","NG11rAWRkG","NG11lZO7c8",
+  "NG11iG87fl","NG11hyH0Wf","NG11njMSbq","NG11f7WBl6","NG1103PLRa",
+  "NG11057xPf","NG11eU6Sny","NG11U0iMFJ","NG11XWIcTG","NG11w5ZYRi",
+  "NG11ljxMAo","NG117QK5lN","NG115Vk8rR","NG11VkrG3L","NG11PsfO0g",
+  "NG11RxhJ04","NG11JySYH8","NG11ezRDMw","NG11KT5gQM","NG11nGSOY1",
+  "NG11O81sTe","NG11GxXt3I","NG11MHmpA0","NG11iBSzb9","NG11h6FIpl",
+  "NG112xrDuC","NG115BPaUV","NG11VHXOTs","NG11fOXbWA","NG119vOSCG",
+  "NG11HeaJIF","NG11sjS8EJ","NG11yJ9SfE","NG11eysQTz","NG112dSGFA",
+  "NG11MuaW0l","NG11k4L7e5","NG11z9HoKW","NG11bSe2Nn","NG11D4Y1V2",
+  "NG11cfuzs3","NG11M2hBmj","NG11aVxuJH","NG11uWvRon","NG11OIvsJ4",
+  "NG11OX0iJQ","NG11Ip3FUL","NG11TQsO7B","NG118B7IP9","NG118dlZQX",
+  "NG116bwg9V","NG11npZabw","NG11JUKDCG","NG11nZV1Tv","NG11ofIltD",
+  "NG11PSoOnW","NG11qu3xNy","NG11qm9T1X","NG11GSmbdW","NG11T2UQHy",
+  "NG11gfwNrI","NG11yGNAMK"
+];
+
+const MAX_CLAIM = 2;
+
+const btn = document.getElementById("btn");
+const result = document.getElementById("result");
+const info = document.getElementById("info");
+
+let claimedCount = Number(localStorage.getItem("claimedCount") || 0);
+let claimedCodes = JSON.parse(localStorage.getItem("claimedCodes") || "[]");
+
+info.innerText = "\u5df2\u9886\u53d6 " + claimedCount + "/" + MAX_CLAIM + " \u4e2a";
+
+if (claimedCount >= MAX_CLAIM) {
+  btn.disabled = true;
+  result.innerText = "\u4f60\u5df2\u9886\u53d6\u6ee1 " + MAX_CLAIM + " \u4e2a\uff0c\u611f\u8c22\u53c2\u4e0e\uff01";
+}
+
+btn.onclick = () => {
+  if (codePool.length === 0) {
+    result.innerText = "\u274c \u5151\u6362\u7801\u5df2\u5168\u90e8\u9886\u5b8c";
+    btn.disabled = true;
+    return;
+  }
+
+  if (claimedCount >= MAX_CLAIM) {
+    result.innerText = "\u274c \u6bcf\u4eba\u6700\u591a\u9886\u53d6 " + MAX_CLAIM + " \u4e2a";
+    btn.disabled = true;
+    return;
+  }
+
+  const idx = Math.floor(Math.random() * codePool.length);
+  const code = codePool.splice(idx, 1)[0];
+
+  claimedCount++;
+  claimedCodes.push(code);
+
+  localStorage.setItem("claimedCount", claimedCount);
+  localStorage.setItem("claimedCodes", JSON.stringify(claimedCodes));
+
+  result.innerText = code;
+  info.innerText = "\u5df2\u9886\u53d6 " + claimedCount + "/" + MAX_CLAIM + " \u4e2a";
+
+  if (claimedCount >= MAX_CLAIM) {
+    btn.disabled = true;
+  }
+};
+</script>
+
+</body>
+</html>
